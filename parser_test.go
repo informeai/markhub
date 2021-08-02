@@ -2,6 +2,7 @@ package markhub
 
 import (
 	"log"
+	// "strings"
 	"testing"
 )
 
@@ -45,9 +46,18 @@ func TestSplitContent(t *testing.T) {
 //go test -v -run ^TestVerifyChars
 func TestVerifyChars(t *testing.T) {
 	m := NewMarkHub()
-	m.content = []byte("# title1\n# title 2\n\nnew paragraph.")
-	b := m.verifyChars()
+	b := m.verifyChars("# title 1")
 	if b == false {
 		t.Errorf("TestSplitContent(): got -> %v, want: true", b)
 	}
+}
+
+//go test -v -run ^TestParseTitles
+func TestParseTitles(t *testing.T) {
+	m := NewMarkHub()
+	m.parseTitles("###### titles 3 ")
+	if len(m.html) == 0 {
+		t.Errorf("TestParseTitles(): got -> %v , want: > 0", len(m.html))
+	}
+	log.Println(m.html)
 }

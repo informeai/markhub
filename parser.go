@@ -2,6 +2,7 @@ package markhub
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"strings"
 )
@@ -14,6 +15,7 @@ const (
 //text the files markdown.
 type MarkHub struct {
 	content []byte
+	html    string
 }
 
 //NewMarkHub return of instance the MarkHub
@@ -46,9 +48,44 @@ func (m *MarkHub) splitContent() []string {
 }
 
 //verifyChars is responsible for checking
-//if there are key characters for the markdown
-//at the beginning of the line.
+// the characters at the beginning of the line.
 func (m *MarkHub) verifyChars(line string) bool {
+	switch string(line[0]) {
+	case "#":
+		fmt.Println("#")
+		return true
+	case ">":
+		fmt.Println(">")
+		return true
+	case "*":
+		fmt.Println("*")
+		return true
+	case "-":
+		fmt.Println("-")
+		return true
+	}
+	return false
+}
 
-	return true
+//parseTitles is responsible for parsing tags h.
+func (m *MarkHub) parseTitles(line string) {
+	start := strings.Split(line, " ")[0]
+	end := strings.Split(line, " ")[1:]
+	inner := strings.Join(end, " ")
+	var verifyHash bool = false
+	var text string = line
+	for _, v := range start {
+		if strings.Compare(string(v), "#") == 0 {
+			verifyHash = true
+			continue
+		} else {
+			verifyHash = false
+			break
+		}
+	}
+	if verifyHash && len(start) < 7 {
+		lenght := len(start)
+		text = fmt.Sprintf("<h%v>%v</h%v>", lenght, inner, lenght)
+	}
+	m.html += text
 }
