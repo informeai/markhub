@@ -1,9 +1,7 @@
 package markhub
 
 import (
-	"fmt"
-	"io/ioutil"
-	"strings"
+	"log"
 	"testing"
 )
 
@@ -17,18 +15,39 @@ func TestNewMarkHub(t *testing.T) {
 
 // go test -v -run ^TestReadFile
 func TestReadFile(t *testing.T) {
-	b, err := ioutil.ReadFile("./test/tester.md")
+	m := NewMarkHub()
+	err := m.readFile("./test/tester.md")
 	if err != nil {
-		t.Errorf("TestReadFile(): got -> %v, want: []byte ", err)
+		t.Errorf("TestReadFile(): got -> %v, want: nil ", err)
 	}
-	fmt.Println(string(b))
-
 }
 
 // go test -v -run ^TestReadString
 func TestReadString(t *testing.T) {
-	reader := strings.NewReader("# title 1")
-	if reader.Len() == 0 {
-		t.Errorf("TestReadString(): got -> %v, want: lenght > 0", reader)
+	m := NewMarkHub()
+	err := m.readString("# title 1")
+	if err != nil {
+		t.Errorf("TestReadString(): got -> %v, want: nil", err)
+	}
+}
+
+//go test -v -run ^TestSplitContent
+func TestSplitContent(t *testing.T) {
+	m := NewMarkHub()
+	m.content = []byte("# title1\n# title 2\n\nnew paragraph.")
+	sliceOfStrings := m.splitContent()
+	if sliceOfStrings == nil {
+		t.Errorf("TestSplitContent(): got -> %v, want: []string", sliceOfStrings)
+	}
+	log.Println(sliceOfStrings)
+}
+
+//go test -v -run ^TestVerifyChars
+func TestVerifyChars(t *testing.T) {
+	m := NewMarkHub()
+	m.content = []byte("# title1\n# title 2\n\nnew paragraph.")
+	b := m.verifyChars()
+	if b == false {
+		t.Errorf("TestSplitContent(): got -> %v, want: true", b)
 	}
 }
