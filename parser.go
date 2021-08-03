@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/informeai/markhub/css"
+	css "github.com/informeai/markhub/css"
 	"io/ioutil"
 	"net/http"
 	"strings"
