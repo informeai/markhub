@@ -86,3 +86,44 @@ func TestServe(t *testing.T) {
 	}
 
 }
+
+// go test -v -run ^ReadFile -bench=.
+func BenchmarkReadFile(b *testing.B) {
+	m := MarkHub{}
+	for n := 0; n < b.N; n++ {
+		_ = m.readFile("./test/tester.md")
+	}
+}
+
+// go test -v -run ^ReadString -bench=.
+func BenchmarkReadString(b *testing.B) {
+	m := MarkHub{}
+	for n := 0; n < b.N; n++ {
+		_ = m.readString("# title 1")
+	}
+}
+
+// go test -v -run ^ParseFile -bench=.
+func BenchmarkParseFile(b *testing.B) {
+	m := MarkHub{}
+	for n := 0; n < b.N; n++ {
+		_ = m.ParseFile("./test/tester.md")
+	}
+}
+
+// go test -v -run ^ParseString -bench=.
+func BenchmarkParseString(b *testing.B) {
+	m := MarkHub{}
+	for n := 0; n < b.N; n++ {
+		_ = m.ParseString("> blockquote")
+	}
+}
+
+// go test -v -run ^GetApi -bench=.
+func BenchmarkGetApi(b *testing.B) {
+	m := MarkHub{}
+	m.content = "# title"
+	for n := 0; n < b.N; n++ {
+		_, _ = m.getApi()
+	}
+}
