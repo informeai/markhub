@@ -1,7 +1,6 @@
 package markhub
 
 import (
-	// "log"
 	"testing"
 )
 
@@ -61,10 +60,23 @@ func TestParseFile(t *testing.T) {
 
 }
 
+// go test -v -run ^TestHTML
+func TestHTML(t *testing.T) {
+	m := MarkHub{}
+	err := m.ParseString("# title 1")
+	if err != nil {
+		t.Errorf("TestHTML(): got -> %v, want: nil", err)
+	}
+	html := m.HTML()
+	if len(html) == 0 {
+		t.Errorf("TestHTML(): got -> %v, want: length > 0", len(html))
+	}
+}
+
 // go test -v -run ^TestServe
 func TestServe(t *testing.T) {
 	m := MarkHub{}
-	err := m.ParseFile("./test/tester.md")
+	err := m.ParseFile("./README.md")
 	if err != nil {
 		t.Errorf("TestServe(): got -> %v, want: nil", err)
 	}

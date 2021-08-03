@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
-	// "time"
 )
 
 var (
@@ -118,6 +117,11 @@ func (m *MarkHub) ParseFile(filePath string) error {
 	template := fmt.Sprintf("<html><head><style>%v</style></head><body>%v</body></html>", string(css), t)
 	m.html = template
 	return nil
+}
+
+//HTML is return html parsed from github api.
+func (m *MarkHub) HTML() string {
+	return m.html
 }
 
 //Serve is render the html at the given address.
