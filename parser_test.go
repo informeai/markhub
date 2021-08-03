@@ -1,8 +1,7 @@
 package markhub
 
 import (
-	"log"
-	// "strings"
+	// "log"
 	"testing"
 )
 
@@ -36,8 +35,42 @@ func TestReadString(t *testing.T) {
 func TestGetApi(t *testing.T) {
 	m := NewMarkHub()
 	m.content = "## teste 1\n>blockotes1\n>blockotes2\n\nmade with :heart:"
-	html, err := m.getApi()
+	_, err := m.getApi()
 	if err != nil {
 		t.Errorf("TestGetApi(): got -> %v, want: nil", err)
 	}
+}
+
+// go test -v -run ^TestParseString
+func TestParseString(t *testing.T) {
+	m := MarkHub{}
+	err := m.ParseString("# h1 title\n:+1:")
+	if err != nil {
+		t.Errorf("TestParseString(): got -> %v, want: nil", err)
+	}
+
+}
+
+// go test -v -run ^TestParseFile
+func TestParseFile(t *testing.T) {
+	m := MarkHub{}
+	err := m.ParseFile("./test/tester.md")
+	if err != nil {
+		t.Errorf("TestParseString(): got -> %v, want: nil", err)
+	}
+
+}
+
+// go test -v -run ^TestServe
+func TestServe(t *testing.T) {
+	m := MarkHub{}
+	err := m.ParseFile("./test/tester.md")
+	if err != nil {
+		t.Errorf("TestServe(): got -> %v, want: nil", err)
+	}
+	err = m.Serve(":4000")
+	if err != nil {
+		t.Errorf("TestServe(): got -> %v, want: nil", err)
+	}
+
 }

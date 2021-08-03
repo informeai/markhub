@@ -3,10 +3,11 @@ package markhub
 import (
 	"encoding/json"
 	"errors"
-	// "fmt"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
+	// "time"
 )
 
 var (
@@ -77,4 +78,58 @@ func (m *MarkHub) getApi() (string, error) {
 	}
 
 	return string(b), nil
+}
+
+//ParseString is responsible for parsing the markdown,
+//text using the github api.
+func (m *MarkHub) ParseString(text string) error {
+	err := m.readString(text)
+	if err != nil {
+		return err
+	}
+	t, err := m.getApi()
+	if err != nil {
+		return err
+	}
+	css, err := ioutil.ReadFile("./css/markdown.css")
+	if err != nil {
+		return err
+	}
+	template := fmt.Sprintf("<html><head><style>%v</style></head><body>%v</body></html>", string(css), t)
+	m.html = template
+	return nil
+}
+
+//ParseFile is responsible for parsing the markdown,
+//file using the github api.
+func (m *MarkHub) ParseFile(filePath string) error {
+	err := m.readFile(filePath)
+	if err != nil {
+		return err
+	}
+	t, err := m.getApi()
+	if err != nil {
+		return err
+	}
+	css, err := ioutil.ReadFile("./css/markdown.css")
+	if err != nil {
+		return err
+	}
+	template := fmt.Sprintf("<html><head><style>%v</style></head><body>%v</body></html>", string(css), t)
+	m.html = template
+	return nil
+}
+
+//Serve is render the html at the given address.
+func (m *MarkHub) Serve(address string) error {
+	serveHandler := func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, m.html)
+	}
+	http.HandleFunc("/", serveHandler)
+	fmt.Println("Serving markdown...")
+	err := http.ListenAndServe(address, nil)
+	if err != nil {
+		return err
+	}
+	return nil
 }

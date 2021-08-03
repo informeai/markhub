@@ -6,6 +6,7 @@
 ###### title 6
 
 > simply dummy text of blockquote.
+
 this is *italic* and **bold**, more ~~sublied~~.
 
 this is simple paragraph text.
@@ -23,7 +24,7 @@ First Header | Second Header
 Content from cell 1 | Content from cell 2
 Content in the first column | Content in the second column
   
-![image](./dev.png)
+![image](https://thepracticaldev.s3.amazonaws.com/i/6hqmcjaxbgbon8ydw93z.png)
 
 [google](http://www.google.com)
 
