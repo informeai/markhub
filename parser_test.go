@@ -46,18 +46,28 @@ func TestSplitContent(t *testing.T) {
 //go test -v -run ^TestVerifyChars
 func TestVerifyChars(t *testing.T) {
 	m := NewMarkHub()
-	b := m.verifyChars("# title 1")
+	m.content = []byte("# title\n>ola\n>mundo  \n> title\n")
+	b := m.verifyChars()
 	if b == false {
 		t.Errorf("TestSplitContent(): got -> %v, want: true", b)
 	}
+	log.Println(m.html)
 }
 
 //go test -v -run ^TestParseTitles
 func TestParseTitles(t *testing.T) {
 	m := NewMarkHub()
-	m.parseTitles("###### titles 3 ")
-	if len(m.html) == 0 {
-		t.Errorf("TestParseTitles(): got -> %v , want: > 0", len(m.html))
+	b := m.parseTitles("### titles 3 ")
+	if b == false {
+		t.Errorf("TestParseTitles(): got -> %v , want: true", b)
 	}
-	log.Println(m.html)
+}
+
+//go test -v -run ^TestParseBlockQuotes
+func TestParseBlockQuotes(t *testing.T) {
+	m := NewMarkHub()
+	b := m.parseBlockQuotes([]string{"> ola", "> mundo  ", "> title"})
+	if b == false {
+		t.Errorf("TestParseBlockQuotes(): got -> %v , want: true", b)
+	}
 }
