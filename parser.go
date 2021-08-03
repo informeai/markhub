@@ -1,21 +1,29 @@
 package markhub
 
 import (
+	"encoding/json"
 	"errors"
-	"fmt"
+	// "fmt"
 	"io/ioutil"
+	"net/http"
 	"strings"
 )
 
-const (
-	startChars string = "#>*-"
+var (
+	//address api the github markdown.
+	API string = "https://api.github.com/markdown"
 )
 
 //MarkHub is struct base for manipulate and parse,
-//text the files markdown.
+//text the files markdown the github.
 type MarkHub struct {
-	content []byte
+	content string
 	html    string
+}
+
+//jsonBody is struct for marshall text.
+type jsonBody struct {
+	Text string `json:"text"`
 }
 
 //NewMarkHub return of instance the MarkHub
@@ -29,7 +37,7 @@ func (m *MarkHub) readFile(filePath string) error {
 	if err != nil {
 		return err
 	}
-	m.content = b
+	m.content = string(b)
 	return nil
 }
 
@@ -38,100 +46,35 @@ func (m *MarkHub) readString(text string) error {
 	if len(text) == 0 {
 		return errors.New("empty text is not allowed.")
 	}
-	m.content = []byte(text)
+	m.content = text
 	return nil
 }
 
-//splitContent return slice of strings separeted by lines.
-func (m *MarkHub) splitContent() []string {
-	if string(m.content[len(m.content)-1]) == "\n" {
-		m.content = m.content[:len(m.content)-1]
+//getApi is responsable of send text markdown for api github,
+//and return the html.
+func (m *MarkHub) getApi() (string, error) {
+	body := jsonBody{Text: m.content}
+	textJson, err := json.Marshal(&body)
+	if err != nil {
+		return "", err
 	}
-	return strings.Split(string(m.content), "\n")
-}
+	reader := strings.NewReader(string(textJson))
+	client := &http.Client{}
 
-//verifyChars is responsible for checking
-// the characters at the beginning of the line.
-func (m *MarkHub) verifyChars() bool {
-	var ok bool = false
-	var blockQuotes []string
-	var isBlockQuote bool = false
-	lines := m.splitContent()
-	for _, l := range lines {
-		fmt.Println(l)
-		switch string(l[0]) {
-		case "#":
-			if isBlockQuote == true && len(blockQuotes) > 0 {
-				ok = m.parseBlockQuotes(blockQuotes)
-				isBlockQuote = false
-
-			}
-			ok = m.parseTitles(l)
-		case ">":
-			blockQuotes = append(blockQuotes, l)
-			isBlockQuote = true
-
-		case "*":
-			fmt.Println("*")
-		case "-":
-			fmt.Println("-")
-		default:
-			if isBlockQuote == true && len(blockQuotes) > 0 {
-				ok = m.parseBlockQuotes(blockQuotes)
-				isBlockQuote = false
-
-			}
-			continue
-
-		}
-
+	req, err := http.NewRequest(http.MethodPost, API, reader)
+	if err != nil {
+		return "", err
+	}
+	req.Header.Add("Accept", "application/vnd.github.v3+json")
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
 	}
 
-	return ok
-}
-
-//parseTitles is responsible for parsing tags h.
-func (m *MarkHub) parseTitles(line string) bool {
-	start := strings.Split(line, " ")[0]
-	end := strings.Split(line, " ")[1:]
-	inner := strings.Join(end, " ")
-	var verifyHash bool = false
-	var text string = line
-	for _, v := range start {
-		if strings.Compare(string(v), "#") == 0 {
-			verifyHash = true
-			continue
-		} else {
-			verifyHash = false
-			break
-		}
-	}
-	if verifyHash && len(start) < 7 {
-		lenght := len(start)
-		text = fmt.Sprintf("<h%v>%v</h%v>", lenght, inner, lenght)
-	}
-	m.html += text
-	return verifyHash
-}
-
-//parseBlockQuotes is responsible for parsing tags blockquotes.
-func (m *MarkHub) parseBlockQuotes(lines []string) bool {
-	var verify bool = false
-	var innerQuotes string = ""
-	var end string
-	for _, l := range lines {
-		if string(l[1]) == " " {
-			end = l[1:]
-		} else {
-			end = fmt.Sprintf(" %v", l[1:])
-		}
-		if l[len(l)-2:] == "  " {
-			innerQuotes += fmt.Sprintf("%v<br>", end)
-		} else {
-			innerQuotes += end
-		}
-		verify = true
-	}
-	m.html += fmt.Sprintf("<blockquotes><p>%v</p></blockquotes>", innerQuotes)
-	return verify
+	return string(b), nil
 }

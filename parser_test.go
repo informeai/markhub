@@ -32,42 +32,12 @@ func TestReadString(t *testing.T) {
 	}
 }
 
-//go test -v -run ^TestSplitContent
-func TestSplitContent(t *testing.T) {
+// go test -v -run ^TestGetApi
+func TestGetApi(t *testing.T) {
 	m := NewMarkHub()
-	m.content = []byte("# title1\n# title 2\n\nnew paragraph.")
-	sliceOfStrings := m.splitContent()
-	if sliceOfStrings == nil {
-		t.Errorf("TestSplitContent(): got -> %v, want: []string", sliceOfStrings)
-	}
-	log.Println(sliceOfStrings)
-}
-
-//go test -v -run ^TestVerifyChars
-func TestVerifyChars(t *testing.T) {
-	m := NewMarkHub()
-	m.content = []byte("# title\n>ola\n>mundo  \n> title\n")
-	b := m.verifyChars()
-	if b == false {
-		t.Errorf("TestSplitContent(): got -> %v, want: true", b)
-	}
-	log.Println(m.html)
-}
-
-//go test -v -run ^TestParseTitles
-func TestParseTitles(t *testing.T) {
-	m := NewMarkHub()
-	b := m.parseTitles("### titles 3 ")
-	if b == false {
-		t.Errorf("TestParseTitles(): got -> %v , want: true", b)
-	}
-}
-
-//go test -v -run ^TestParseBlockQuotes
-func TestParseBlockQuotes(t *testing.T) {
-	m := NewMarkHub()
-	b := m.parseBlockQuotes([]string{"> ola", "> mundo  ", "> title"})
-	if b == false {
-		t.Errorf("TestParseBlockQuotes(): got -> %v , want: true", b)
+	m.content = "## teste 1\n>blockotes1\n>blockotes2\n\nmade with :heart:"
+	html, err := m.getApi()
+	if err != nil {
+		t.Errorf("TestGetApi(): got -> %v, want: nil", err)
 	}
 }
