@@ -1,3 +1,6 @@
+package css
+
+var TemplCss = `
 :root{
 	--titles: #24292E;
 	--subtitles: #6A737D;
@@ -134,3 +137,5 @@ tbody tr td{
 	border: 1px solid var(--border-table);
 	padding: 0.5rem 1rem;
 }
+
+`

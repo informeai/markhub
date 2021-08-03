@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/informeai/markhub/css"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -11,7 +12,8 @@ import (
 
 var (
 	//address api the github markdown.
-	API string = "https://api.github.com/markdown"
+	API      string = "https://api.github.com/markdown"
+	templCss string = css.TemplCss
 )
 
 //MarkHub is struct base for manipulate and parse,
@@ -90,11 +92,7 @@ func (m *MarkHub) ParseString(text string) error {
 	if err != nil {
 		return err
 	}
-	css, err := ioutil.ReadFile("./css/markdown.css")
-	if err != nil {
-		return err
-	}
-	template := fmt.Sprintf("<html><head><style>%v</style></head><body>%v</body></html>", string(css), t)
+	template := fmt.Sprintf("<html><head><style>%v</style></head><body>%v</body></html>", templCss, t)
 	m.html = template
 	return nil
 }
@@ -110,11 +108,8 @@ func (m *MarkHub) ParseFile(filePath string) error {
 	if err != nil {
 		return err
 	}
-	css, err := ioutil.ReadFile("./css/markdown.css")
-	if err != nil {
-		return err
-	}
-	template := fmt.Sprintf("<html><head><style>%v</style></head><body>%v</body></html>", string(css), t)
+
+	template := fmt.Sprintf("<html><head><style>%v</style></head><body>%v</body></html>", templCss, t)
 	m.html = template
 	return nil
 }
